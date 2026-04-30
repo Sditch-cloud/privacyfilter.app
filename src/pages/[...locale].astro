@@ -7,7 +7,8 @@ import {
   localeNames,
   routeToLocale,
   localeToHtmlLang,
-  localeToOgLocale
+  localeToOgLocale,
+  localeIsRtl
 } from "../lib/i18n.js";
 
 export function getStaticPaths() {
@@ -15,7 +16,14 @@ export function getStaticPaths() {
     { params: { locale: undefined } },
     { params: { locale: "ja" } },
     { params: { locale: "zh-hans" } },
-    { params: { locale: "zh-hant" } }
+    { params: { locale: "zh-hant" } },
+    { params: { locale: "es" } },
+    { params: { locale: "de" } },
+    { params: { locale: "fr" } },
+    { params: { locale: "ru" } },
+    { params: { locale: "pt-br" } },
+    { params: { locale: "ar" } },
+    { params: { locale: "ko" } }
   ];
 }
 
@@ -38,10 +46,11 @@ const repoUrl = "https://github.com/becoolme/privacyfilter.app";
 const repoIssuesUrl = `${repoUrl}/issues`;
 const repoLicenseUrl = `${repoUrl}/blob/main/LICENSE`;
 const repoContribUrl = `${repoUrl}/blob/main/CONTRIBUTING.md`;
+const blogPath = pathLocale ? `/${pathLocale}/blog/` : "/blog/";
 ---
 
 <!doctype html>
-<html lang={htmlLang}>
+<html lang={htmlLang} dir={localeIsRtl[locale] ? "rtl" : "ltr"}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -183,7 +192,7 @@ const repoContribUrl = `${repoUrl}/blob/main/CONTRIBUTING.md`;
             <a class="text-muted no-underline hover:text-accent transition-colors" href="#entity-types">{t.navEntities}</a>
             <a class="text-muted no-underline hover:text-accent transition-colors" href="#use-cases">{t.navUseCases}</a>
             <a class="text-muted no-underline hover:text-accent transition-colors" href="#faq">{t.navFaq}</a>
-            <a class="text-muted no-underline hover:text-accent transition-colors" href="/blog/">{t.navBlog}</a>
+            <a class="text-muted no-underline hover:text-accent transition-colors" href={blogPath}>{t.navBlog}</a>
             <a class="text-muted no-underline hover:text-accent transition-colors" href="https://huggingface.co/openai/privacy-filter" target="_blank" rel="noopener">{t.navModel}</a>
             <a
               class="inline-flex items-center gap-1.5 text-muted no-underline hover:text-accent transition-colors"
@@ -661,7 +670,7 @@ const repoContribUrl = `${repoUrl}/blob/main/CONTRIBUTING.md`;
           </a>
           <p class="my-0">{t.footerText}</p>
           <nav aria-label={t.footerOpenSource} class="flex flex-wrap justify-center gap-x-4 gap-y-1">
-            <a class="text-accent hover:underline" href="/blog/">{t.navBlog}</a>
+            <a class="text-accent hover:underline" href={blogPath}>{t.navBlog}</a>
             <a class="text-accent hover:underline" href={repoUrl} target="_blank" rel="noopener">{t.footerSource}</a>
             <a class="text-accent hover:underline" href={repoLicenseUrl} target="_blank" rel="noopener">{t.footerLicense}</a>
             <a class="text-accent hover:underline" href={repoContribUrl} target="_blank" rel="noopener">{t.footerContribute}</a>
@@ -672,6 +681,25 @@ const repoContribUrl = `${repoUrl}/blob/main/CONTRIBUTING.md`;
             ·
             <a class="text-accent hover:underline" href="https://huggingface.co/docs/transformers.js" target="_blank" rel="noopener">Transformers.js</a>
           </p>
+          <nav aria-label={t.languageMenu} class="mt-1 flex flex-col items-center gap-1.5">
+            <span class="text-muted font-semibold uppercase tracking-wider text-[11px]">{t.languageMenu}</span>
+            <ul class="m-0 p-0 list-none flex flex-wrap justify-center gap-x-3 gap-y-1.5">
+              {localeNames.map((l) => {
+                const href = l.path === "/" ? "/" : `${l.path}/`;
+                const isCurrent = l.locale === locale;
+                return (
+                  <li>
+                    <a
+                      class:list={["hover:underline", isCurrent ? "text-text font-semibold" : "text-accent"]}
+                      href={href}
+                      hreflang={localeToHtmlLang[l.locale]}
+                      aria-current={isCurrent ? "page" : undefined}
+                    >{l.label}</a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </div>
       </footer>
     </main>

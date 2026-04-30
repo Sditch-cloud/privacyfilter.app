@@ -1,0 +1,54 @@
+---
+import type { BlogLocale } from "../lib/blog";
+import { htmlLangFor } from "../lib/blog";
+
+export interface LanguageOption {
+  locale: BlogLocale;
+  label: string;
+  href: string;
+}
+
+interface Props {
+  currentLocale: BlogLocale;
+  options: LanguageOption[];
+  menuLabel: string;
+}
+
+const { currentLocale, options, menuLabel } = Astro.props;
+const current = options.find((o) => o.locale === currentLocale) ?? options[0];
+---
+
+<details class="relative" aria-label={menuLabel}>
+  <summary
+    class="flex items-center gap-1.5 px-3 py-1.5 border border-line bg-white text-sm font-medium cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden hover:border-accent transition-colors"
+  >
+    <span lang={htmlLangFor(current.locale)}>{current.label}</span>
+    <span aria-hidden="true" class="text-muted text-[10px]">▾</span>
+  </summary>
+  <div
+    class="absolute right-0 top-full mt-1 z-20 min-w-[160px] py-1 border border-line bg-white shadow-[0_12px_28px_rgba(20,32,51,0.14)]"
+    role="menu"
+  >
+    {options.map((opt) =>
+      opt.locale === currentLocale ? (
+        <span
+          class="block px-3 py-1.5 text-sm bg-bg text-text font-semibold"
+          aria-current="page"
+          lang={htmlLangFor(opt.locale)}
+        >
+          {opt.label}
+        </span>
+      ) : (
+        <a
+          class="block px-3 py-1.5 text-sm text-text no-underline hover:bg-bg transition-colors"
+          href={opt.href}
+          hreflang={htmlLangFor(opt.locale)}
+          lang={htmlLangFor(opt.locale)}
+          role="menuitem"
+        >
+          {opt.label}
+        </a>
+      )
+    )}
+  </div>
+</details>

@@ -1,22 +1,34 @@
 ---
-import "../../styles/global.css";
-import { i18n, localeNames } from "../../lib/i18n.js";
+import "../../../styles/global.css";
+import { i18n, localeNames, localeIsRtl } from "../../../lib/i18n.js";
 import {
   allBlogLocales,
   blogIndexPath,
   formatPostDate,
   getPostsForLocale,
   htmlLangFor,
+  localeFromLangParam,
+  localizedLangParams,
   ogLocaleFor,
   postSlug
-} from "../../lib/blog";
-import BlogLanguageSwitcher from "../../components/BlogLanguageSwitcher.astro";
+} from "../../../lib/blog";
+import BlogLanguageSwitcher from "../../../components/BlogLanguageSwitcher.astro";
 
-const locale = "en";
+export async function getStaticPaths() {
+  return localizedLangParams.map(({ lang }) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const locale = localeFromLangParam(lang!);
+if (!locale) {
+  return Astro.redirect("/blog/");
+}
+
 const t = i18n[locale];
 const tBlog = t.blog;
 const posts = await getPostsForLocale(locale);
 const repoUrl = "https://github.com/becoolme/privacyfilter.app";
+const homeHref = `/${lang}/`;
 const languageOptions = localeNames.map((l) => ({
   locale: l.locale,
   label: l.label,
@@ -25,7 +37,7 @@ const languageOptions = localeNames.map((l) => ({
 ---
 
 <!doctype html>
-<html lang={htmlLangFor(locale)}>
+<html lang={htmlLangFor(locale)} dir={localeIsRtl[locale] ? "rtl" : "ltr"}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -60,7 +72,7 @@ const languageOptions = localeNames.map((l) => ({
       >
         <a
           class="inline-flex items-center gap-2.5 text-text no-underline"
-          href="/"
+          href={homeHref}
           aria-label={t.homeLinkLabel}
         >
           <span
@@ -72,7 +84,7 @@ const languageOptions = localeNames.map((l) => ({
         </a>
         <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
           <nav aria-label="Primary" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-            <a class="text-muted no-underline hover:text-accent transition-colors" href="/">{tBlog.navHome}</a>
+            <a class="text-muted no-underline hover:text-accent transition-colors" href={homeHref}>{tBlog.navHome}</a>
             <a class="text-text no-underline font-semibold" href={blogIndexPath(locale)} aria-current="page">{t.navBlog}</a>
             <a
               class="text-muted no-underline hover:text-accent transition-colors"
@@ -132,7 +144,7 @@ const languageOptions = localeNames.map((l) => ({
         class="mt-10 pt-5 pb-9 border-t border-line text-[13px] text-muted"
       >
         <p class="my-0 text-center">
-          <a class="text-accent hover:underline" href="/">{tBlog.backHome}</a>
+          <a class="text-accent hover:underline" href={homeHref}>{tBlog.backHome}</a>
         </p>
         <nav aria-label={t.languageMenu} class="mt-4 flex flex-col items-center gap-1.5">
           <span class="text-muted font-semibold uppercase tracking-wider text-[11px]">{t.languageMenu}</span>

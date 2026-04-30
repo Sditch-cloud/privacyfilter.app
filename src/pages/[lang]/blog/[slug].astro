@@ -1,7 +1,7 @@
 ---
-import "../../styles/global.css";
+import "../../../styles/global.css";
 import { render } from "astro:content";
-import { i18n, localeNames } from "../../lib/i18n.js";
+import { i18n, localeNames, localeIsRtl } from "../../../lib/i18n.js";
 import {
   blogIndexPath,
   blogPostPath,
@@ -9,20 +9,33 @@ import {
   getAllAlternates,
   getPostsForLocale,
   htmlLangFor,
+  localeFromLangParam,
+  localizedLangParams,
   ogLocaleFor,
   postSlug
-} from "../../lib/blog";
-import BlogLanguageSwitcher from "../../components/BlogLanguageSwitcher.astro";
+} from "../../../lib/blog";
+import BlogLanguageSwitcher from "../../../components/BlogLanguageSwitcher.astro";
 
 export async function getStaticPaths() {
-  const posts = await getPostsForLocale("en");
-  return posts.map((post) => ({
-    params: { slug: postSlug(post) },
-    props: { post }
-  }));
+  const paths = [];
+  for (const { lang, locale } of localizedLangParams) {
+    const posts = await getPostsForLocale(locale);
+    for (const post of posts) {
+      paths.push({
+        params: { lang, slug: postSlug(post) },
+        props: { post }
+      });
+    }
+  }
+  return paths;
 }
 
-const locale = "en";
+const { lang } = Astro.params;
+const locale = localeFromLangParam(lang!);
+if (!locale) {
+  return Astro.redirect("/blog/");
+}
+
 const t = i18n[locale];
 const tBlog = t.blog;
 const { post } = Astro.props;
@@ -38,10 +51,11 @@ const languageOptions = localeNames.map((l) => ({
 
 const repoUrl = "https://github.com/becoolme/privacyfilter.app";
 const pageTitle = `${post.data.title} · ${tBlog.heading} · Privacy Filter`;
+const homeHref = `/${lang}/`;
 ---
 
 <!doctype html>
-<html lang={htmlLangFor(locale)}>
+<html lang={htmlLangFor(locale)} dir={localeIsRtl[locale] ? "rtl" : "ltr"}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -99,7 +113,7 @@ const pageTitle = `${post.data.title} · ${tBlog.heading} · Privacy Filter`;
       >
         <a
           class="inline-flex items-center gap-2.5 text-text no-underline"
-          href="/"
+          href={homeHref}
           aria-label={t.homeLinkLabel}
         >
           <span
@@ -111,7 +125,7 @@ const pageTitle = `${post.data.title} · ${tBlog.heading} · Privacy Filter`;
         </a>
         <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
           <nav aria-label="Primary" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-            <a class="text-muted no-underline hover:text-accent transition-colors" href="/">{tBlog.navHome}</a>
+            <a class="text-muted no-underline hover:text-accent transition-colors" href={homeHref}>{tBlog.navHome}</a>
             <a class="text-muted no-underline hover:text-accent transition-colors" href={blogIndexPath(locale)}>{t.navBlog}</a>
             <a
               class="text-muted no-underline hover:text-accent transition-colors"
@@ -162,7 +176,7 @@ const pageTitle = `${post.data.title} · ${tBlog.heading} · Privacy Filter`;
         <p class="my-0 text-center">
           <a class="text-accent hover:underline" href={blogIndexPath(locale)}>{tBlog.morePosts}</a>
           <span aria-hidden="true"> · </span>
-          <a class="text-accent hover:underline" href="/">{tBlog.backHome}</a>
+          <a class="text-accent hover:underline" href={homeHref}>{tBlog.backHome}</a>
         </p>
         <nav aria-label={t.languageMenu} class="mt-4 flex flex-col items-center gap-1.5">
           <span class="text-muted font-semibold uppercase tracking-wider text-[11px]">{t.languageMenu}</span>
@@ -188,7 +202,7 @@ const pageTitle = `${post.data.title} · ${tBlog.heading} · Privacy Filter`;
     <style is:global>
       .prose-content {
         color: var(--color-text);
-        line-height: 1.75;
+        line-height: 1.85;
         font-size: 16px;
       }
       .prose-content > * + * {
@@ -200,14 +214,14 @@ const pageTitle = `${post.data.title} · ${tBlog.heading} · Privacy Filter`;
         font-size: 1.5rem;
         font-weight: 700;
         letter-spacing: -0.01em;
-        line-height: 1.25;
+        line-height: 1.3;
       }
       .prose-content h3 {
         margin-top: 1.75rem;
         margin-bottom: 0.5rem;
         font-size: 1.15rem;
         font-weight: 700;
-        line-height: 1.3;
+        line-height: 1.35;
       }
       .prose-content p {
         margin: 0;
@@ -231,7 +245,7 @@ const pageTitle = `${post.data.title} · ${tBlog.heading} · Privacy Filter`;
         list-style: decimal;
       }
       .prose-content li + li {
-        margin-top: 0.35rem;
+        margin-top: 0.45rem;
       }
       .prose-content code {
         background: #eef3fa;
