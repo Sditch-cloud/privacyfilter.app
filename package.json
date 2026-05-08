@@ -13,7 +13,11 @@
     "build": "astro build",
     "check": "astro check",
     "preview": "astro preview",
-    "deploy": "pnpm build && wrangler deploy"
+    "deploy": "pnpm build && wrangler deploy",
+    "desktop:assets": "node ./scripts/prepare-desktop-assets.mjs",
+    "desktop:serve": "node ./src/desktop/server.mjs",
+    "desktop:start": "pnpm build && pnpm desktop:assets && node ./src/desktop/server.mjs",
+    "desktop:build:win": "pnpm build && pnpm desktop:assets && bun build ./src/desktop/server.mjs --compile --outfile ./release/privacyfilter.exe"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -23,6 +27,7 @@
     "typescript": "^5.6.3"
   },
   "devDependencies": {
+    "undici": "^7.16.0",
     "@tailwindcss/vite": "^4.2.4",
     "tailwindcss": "^4.2.4",
     "wrangler": "^4.0.0"

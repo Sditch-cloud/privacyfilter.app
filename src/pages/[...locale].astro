@@ -709,11 +709,22 @@ const blogPath = pathLocale ? `/${pathLocale}/blog/` : "/blog/";
       import { createWorker } from "tesseract.js";
       import { i18n, demos } from "../lib/i18n.js";
 
-      env.allowLocalModels = false;
+      const desktopRuntime =
+        typeof window !== "undefined" && typeof window.__PRIVACYFILTER_DESKTOP__ === "object"
+          ? window.__PRIVACYFILTER_DESKTOP__
+          : null;
+      const desktopOcr = desktopRuntime?.ocr ?? null;
+
+      env.allowLocalModels = Boolean(desktopRuntime?.allowLocalModels);
+      env.allowRemoteModels = desktopRuntime?.allowRemoteModels ?? true;
+      if (desktopRuntime?.localModelPath) {
+        env.localModelPath = desktopRuntime.localModelPath;
+      }
       env.remoteHost =
-        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        desktopRuntime?.remoteHost ||
+        (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
           ? "https://huggingface.co/"
-          : `${window.location.origin}/hf/`;
+          : `${window.location.origin}/hf/`);
       env.useBrowserCache = true;
       env.useWasmCache = true;
       env.cacheKey = "privacy-filter-model-v1";
@@ -1099,6 +1110,7 @@ const blogPath = pathLocale ? `/${pathLocale}/blog/` : "/blog/";
         modelPromise = pipeline("token-classification", "openai/privacy-filter", {
             device,
             dtype: "q4",
+            local_files_only: Boolean(desktopRuntime?.offlineOnly),
             progress_callback: (progress) => {
               if (!progress?.file) return;
               const percent = Number.isFinite(progress.progress) ? ` ${Math.round(progress.progress)}%` : "";
@@ -1132,6 +1144,10 @@ const blogPath = pathLocale ? `/${pathLocale}/blog/` : "/blog/";
 
         imageStatus.textContent = t("imageOcrLoading") ?? "Loading local OCR model...";
         ocrPromise = createWorker("eng", 1, {
+          workerPath: desktopOcr?.workerPath,
+          corePath: desktopOcr?.corePath,
+          langPath: desktopOcr?.langPath,
+          gzip: desktopOcr?.gzip ?? true,
           logger: (message) => {
             if (!message?.status) return;
             const percent = Number.isFinite(message.progress)

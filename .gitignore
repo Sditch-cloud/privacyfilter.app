@@ -36,6 +36,8 @@ build/
 .nuxt/
 .output/
 .astro/
+desktop-assets/
+release/
 
 # Testing
 coverage/
