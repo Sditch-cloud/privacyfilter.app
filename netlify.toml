@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/hf/*"
+  to = "https://privacyfilter.app/hf/:splat"
+  status = 200
+  force = true
