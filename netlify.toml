@@ -3,3 +3,8 @@ from = "/hf/*"
 to = "https://huggingface.co/:splat"
 status = 200
 force = true
+[[redirects]]
+from = "/api/resolve-cache/*"
+to = "https://huggingface.co/api/resolve-cache/:splat"
+status = 200
+force = true
