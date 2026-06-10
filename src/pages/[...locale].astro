@@ -714,7 +714,6 @@ const blogPath = pathLocale ? `/${pathLocale}/blog/` : "/blog/";
         window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
           ? "https://huggingface.co/"
           : `${window.location.origin}/hf/`;
-      env.remoteHost = "https://hf-mirror.com";
       env.useBrowserCache = true;
       env.useWasmCache = true;
       env.cacheKey = "privacy-filter-model-v1";
