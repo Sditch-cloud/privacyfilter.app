@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "privacyfilter-app",
+  "name": "privacy-filter",
   "main": "./src/worker.ts",
   "compatibility_date": "2026-04-24",
   "assets": {
