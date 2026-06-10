@@ -3,7 +3,6 @@ interface Env {
 }
 
 const HUGGING_FACE_ORIGIN = "https://huggingface.co";
-const HUGGING_FACE_MIRROR_ORIGIN = "https://hf-mirror.com";
 
 const proxyHeaders = [
   "accept",
@@ -59,7 +58,7 @@ async function proxyHuggingFace(request: Request, url: URL) {
     }
   }
 
-  const upstreamUrl = new URL(url.pathname.replace(/^\/hf\//, "/"), HUGGING_FACE_MIRROR_ORIGIN);
+  const upstreamUrl = new URL(url.pathname.replace(/^\/hf\//, "/"), HUGGING_FACE_ORIGIN);
   upstreamUrl.search = url.search;
 
   const headers = new Headers();
