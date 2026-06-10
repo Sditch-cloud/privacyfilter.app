@@ -1,10 +1,10 @@
 [[redirects]]
 from = "/hf/*"
-to = "https://huggingface.co/:splat"
+to = "https://hf-mirror.com/:splat"
 status = 200
 force = true
 [[redirects]]
 from = "/api/resolve-cache/*"
-to = "https://huggingface.co/api/resolve-cache/:splat"
+to = "https://hf-mirror.com/api/resolve-cache/:splat"
 status = 200
 force = true
