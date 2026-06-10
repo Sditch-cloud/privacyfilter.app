@@ -1,5 +1,5 @@
 [[redirects]]
-  from = "/hf/*"
-  to = "https://privacyfilter.app/hf/:splat"
-  status = 200
-  force = true
+from = "/hf/*"
+to = "https://huggingface.co/:splat"
+status = 200
+force = true
